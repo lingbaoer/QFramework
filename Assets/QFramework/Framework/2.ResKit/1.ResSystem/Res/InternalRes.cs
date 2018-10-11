@@ -1,11 +1,9 @@
 ﻿/****************************************************************************
  * Copyright (c) 2017 snowcold
- * Copyright (c) 2017 liangxie
+ * Copyright (c) 2017 ~ 2018.7 liangxie
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
- * https://github.com/liangxiegame/QSingleton
- * https://github.com/liangxiegame/QChain
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,37 +26,38 @@
 
 namespace QFramework
 {
-    using System;
     using UnityEngine;
     using System.Collections;
+
+    public enum InternalResNamePrefixType
+    {
+        Url, // resources://
+        Folder, // Resources/
+    }
     
     public class InternalRes : BaseRes
-    {
+    { 
         private ResourceRequest mResourceRequest;
 
-        public static InternalRes Allocate(string name)
+        private string mPath;
+        
+        public static InternalRes Allocate(string name,InternalResNamePrefixType prefixType)
         {
-            InternalRes res = SafeObjectPool<InternalRes>.Instance.Allocate();
+            var res = SafeObjectPool<InternalRes>.Instance.Allocate();
             if (res != null)
             {
                 res.AssetName = name;
             }
+
+            if (prefixType == InternalResNamePrefixType.Url)
+            {
+                res.mPath = name.Substring("resources://".Length);
+            }
+            else
+            {
+                res.mPath = name.Substring("Resources/".Length);
+            }
             return res;
-        }
-
-        public static string Name2Path(string name)
-        {
-            return name.Substring(10);
-        }
-
-        public InternalRes(string assetName) : base(assetName)
-        {
-
-        }
-
-        public InternalRes()
-        {
-
         }
 
         public override void AcceptLoaderStrategySync(IResLoader loader, IResLoaderStrategy strategy)
@@ -78,22 +77,18 @@ namespace QFramework
                 return false;
             }
 
-            if (string.IsNullOrEmpty(mAssetName))
+            if (mAssetName.IsNullOrEmpty())
             {
                 return false;
             }
 
             State = ResState.Loading;
 
-            //TimeDebugger timer = ResMgr.Instance.timeDebugger;
-
-            //timer.Begin("Resources.Load:" + mName);
-            mAsset = Resources.Load(Name2Path(mAssetName));
-            //timer.End();
+            mAsset = Resources.Load(mPath);
 
             if (mAsset == null)
             {
-                Log.E("Failed to Load Asset From Resources:" + Name2Path(mAssetName));
+                Log.E("Failed to Load Asset From Resources:" + mPath);
                 OnResLoadFaild();
                 return false;
             }
@@ -116,10 +111,10 @@ namespace QFramework
 
             State = ResState.Loading;
 
-            ResMgr.Instance.PostIEnumeratorTask(this);
+            ResMgr.Instance.PushIEnumeratorTask(this);
         }
 
-        public override IEnumerator StartIEnumeratorTask(System.Action finishCallback)
+        public override IEnumerator DoLoadAsync(System.Action finishCallback)
         {
             if (RefCount <= 0)
             {
@@ -128,13 +123,13 @@ namespace QFramework
                 yield break;
             }
 
-            ResourceRequest rQ = Resources.LoadAsync(Name2Path(mAssetName));
+            var resourceRequest = Resources.LoadAsync(mPath);
 
-            mResourceRequest = rQ;
-            yield return rQ;
+            mResourceRequest = resourceRequest;
+            yield return resourceRequest;
             mResourceRequest = null;
 
-            if (!rQ.isDone)
+            if (!resourceRequest.isDone)
             {
                 Log.E("Failed to Load Resources:" + mAssetName);
                 OnResLoadFaild();
@@ -142,7 +137,7 @@ namespace QFramework
                 yield break;
             }
 
-            mAsset = rQ.asset;
+            mAsset = resourceRequest.asset;
 
             State = ResState.Ready;
 

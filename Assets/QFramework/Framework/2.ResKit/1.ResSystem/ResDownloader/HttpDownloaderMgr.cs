@@ -1,7 +1,6 @@
 ﻿/****************************************************************************
  * Copyright (c) 2017 snowcold
- * Copyright (c) 2017 liangxie
- * Copyright (c) 2018.3 liangxie
+ * Copyright (c) 2017 ~ 2018.9 liangxie
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
@@ -41,7 +40,7 @@ namespace QFramework
 
     //http下载管理器
     [QMonoSingletonPath("[Singleton]/HttpDownloader")]
-    public class HttpDownloaderMgr : QMonoSingleton<HttpDownloaderMgr>
+    public class HttpDownloaderMgr : MonoSingleton<HttpDownloaderMgr>
     {
         public static string TimeOutError = "Time-Out";
         enum DownloadEvent
@@ -461,7 +460,7 @@ namespace QFramework
         }
 
         // 退出游戏回调，只在游戏结束时调用一次
-        protected void OnDestroy()
+        protected override void OnDestroy()
         {
             lock (mRequestLock)
             {

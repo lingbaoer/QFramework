@@ -1,11 +1,9 @@
-/****************************************************************************
+﻿/****************************************************************************
  * Copyright (c) 2017 snowcold
- * Copyright (c) 2017 liangxie
+ * Copyright (c) 2017 ~ 2018.5 liangxie
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
- * https://github.com/liangxiegame/QSingleton
- * https://github.com/liangxiegame/QChain
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,57 +26,72 @@
 
 namespace QFramework
 {
-    using UnityEngine;
     using System.Collections.Generic;
-
+    using UnityEngine;
+    
     [QMonoSingletonPath("[Framework]/ResMgr")]
-    public class ResMgr : QMonoSingleton<ResMgr>, IEnumeratorTaskMgr
+    public class ResMgr : MonoSingleton<ResMgr>, IEnumeratorTaskMgr
     {
+        #region ID:RKRM001 Init v0.1.0 Unity5.5.1p4
+
+        /// <summary>
+        /// 初始化bin文件
+        /// </summary>
+        public static void Init()
+        {
+            Instance.InitResMgr();
+        }
+
+        #endregion
+        
+        public int Count
+        {
+            get { return mResList.Count; }
+        }
+        
         #region 字段
 
-        private Dictionary<string, IRes> mResDictionary = new Dictionary<string, IRes>();
-        private List<IRes> mResList = new List<IRes>();
-        [SerializeField] private int mCurrentCoroutineCount = 0;
+        private readonly Dictionary<string, IRes> mResDictionary = new Dictionary<string, IRes>();
+        private readonly List<IRes> mResList = new List<IRes>();
+        [SerializeField] private int mCurrentCoroutineCount;
         private int mMaxCoroutineCount = 8; //最快协成大概在6到8之间
-        //private TimeDebugger mTimeDebugger;
         private LinkedList<IEnumeratorTask> mIEnumeratorTaskStack = new LinkedList<IEnumeratorTask>();
 
-        private bool mIsWorking = true;
-
         //Res 在ResMgr中 删除的问题，ResMgr定时收集列表中的Res然后删除
-        private bool mIsResMapDirty = false;
+        private bool mIsResMapDirty;
 
         #endregion
 
-        public static void Init()
-        {
+		public void InitResMgr()
+        {   
 #if UNITY_EDITOR
             if (AbstractRes.SimulateAssetBundleInEditor)
             {
-                AssetBundleExporterForSimulateMode.BuildDataTable();
+                EditorRuntimeAssetDataCollector.BuildDataTable();
             }
+            else
 #endif
-            AssetDataTable.Instance.Reset();
-            List<string> outResult = new List<string>();
-            FileMgr.Instance.GetFileInInner("asset_bindle_config.bin", outResult);
-            for (int i = 0; i < outResult.Count; ++i)
             {
-                Log.I("Init[ResMgr]: {0}",outResult[i]);
-                AssetDataTable.Instance.LoadFromFile(outResult[i]);
+                ResDatas.Instance.Reset();
+                var outResult = new List<string>();
+                FileMgr.Instance.GetFileInInner("asset_bindle_config.bin", outResult);
+                foreach (var outRes in outResult)
+                {
+                    ResDatas.Instance.LoadFromFile(outRes);
+                }
             }
-            
-            AssetDataTable.Instance.SwitchLanguage("cn");
-            Log.I("Init[ResMgr]");
+
+            ResDatas.Instance.SwitchLanguage("cn");
         }
 
         #region 属性
 
-        public void SetResMapDirty()
+        public void ClearOnUpdate()
         {
             mIsResMapDirty = true;
         }
 
-        public void PostIEnumeratorTask(IEnumeratorTask task)
+        public void PushIEnumeratorTask(IEnumeratorTask task)
         {
             if (task == null)
             {
@@ -108,6 +121,7 @@ namespace QFramework
             if (res != null)
             {
                 mResDictionary.Add((ownerBundleName + assetName).ToLower(), res);
+                
                 if (!mResList.Contains(res))
                 {
                     mResList.Add(res);
@@ -126,7 +140,7 @@ namespace QFramework
 
             if (!createNew)
             {
-                Log.I("createNew:{0}", createNew);
+                Log.I("createNew:{0}",createNew);
                 return null;
             }
 
@@ -135,7 +149,6 @@ namespace QFramework
             if (res != null)
             {
                 mResDictionary.Add(assetName, res);
-                mResList.Add(res);
                 if (!mResList.Contains(res))
                 {
                     mResList.Add(res);
@@ -155,7 +168,7 @@ namespace QFramework
             return default(R);
         }
 
-        public R GetAsset<R>(string name) where R : UnityEngine.Object
+        public R GetAsset<R>(string name) where R : Object
         {
             IRes res = null;
             if (mResDictionary.TryGetValue(name, out res))
@@ -172,16 +185,13 @@ namespace QFramework
 
         private void Update()
         {
-            if (mIsWorking)
+            if (mIsResMapDirty)
             {
-                if (mIsResMapDirty)
-                {
-                    RemoveUnusedRes();
-                }
+                RemoveUnusedRes();
             }
         }
 
-        private void RemoveUnusedRes()
+        public void RemoveUnusedRes()
         {
             if (!mIsResMapDirty)
             {
@@ -190,10 +200,9 @@ namespace QFramework
 
             mIsResMapDirty = false;
 
-            IRes res = null;
-            for (int i = mResList.Count - 1; i >= 0; --i)
+            for (var i = mResList.Count - 1; i >= 0; --i)
             {
-                res = mResList[i];
+                var res = mResList[i];
                 if (res.RefCount <= 0 && res.State != ResState.Loading)
                 {
                     if (res.ReleaseRes())
@@ -229,9 +238,10 @@ namespace QFramework
             mIEnumeratorTaskStack.RemoveFirst();
 
             ++mCurrentCoroutineCount;
-            StartCoroutine(task.StartIEnumeratorTask(OnIEnumeratorTaskFinish));
+            StartCoroutine(task.DoLoadAsync(OnIEnumeratorTaskFinish));
         }
 
         #endregion
+
     }
 }

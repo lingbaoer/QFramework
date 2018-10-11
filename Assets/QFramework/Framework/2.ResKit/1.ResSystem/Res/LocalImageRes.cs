@@ -3,8 +3,6 @@
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
- * https://github.com/liangxiegame/QSingleton
- * https://github.com/liangxiegame/QChain
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +46,7 @@ namespace QFramework
         private string mFullPath;
         private string mHashCode;
         private object mRawAsset;
-        private WWW mWWW;
+        private WWW mWWW = null;
 
         public static LocalImageRes Allocate(string name)
         {
@@ -71,7 +69,7 @@ namespace QFramework
             get { return string.Format("{0}{1}", FilePath.PersistentDataPath4Photo, mHashCode); }
         }
 
-        public override object RawAsset
+        public virtual object RawAsset
         {
             get { return mRawAsset; }
         }
@@ -186,13 +184,13 @@ namespace QFramework
                 return;
             }
 
-            ResMgr.Instance.PostIEnumeratorTask(this);
+            ResMgr.Instance.PushIEnumeratorTask(this);
             //ResMgr.S.PostLoadTask(LoadImage());
         }
 
         //完全的WWW方式,Unity 帮助管理纹理缓存，并且效率貌似更高
         // TODO:persistantPath 用 read
-        public override IEnumerator StartIEnumeratorTask(System.Action finishCallback)
+        public override IEnumerator DoLoadAsync(System.Action finishCallback)
         {
             var imageBytes = File.ReadAllBytes(mFullPath);
 

@@ -1,7 +1,7 @@
 /****************************************************************************
  * Copyright (c) 2017 imagicbell
- * Copyright (c) 2017 ouyanggongming@putao.com
- * Copyright (c) 2017 liangxie
+ * Copyright (c) 2017 snowcold
+ * Copyright (c) 2017 ~ 7 liangxie
  *
  * TODO: 这个应该写成扩展关键字方式的
  * 
@@ -123,9 +123,9 @@ namespace QFramework
 				return false;
 			}
 
-			using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+			using (var fs = new FileStream(path, FileMode.OpenOrCreate))
 			{
-				XmlSerializer xmlserializer = new XmlSerializer(obj.GetType());
+				var xmlserializer = new XmlSerializer(obj.GetType());
 				xmlserializer.Serialize(fs, obj);
 				return true;
 			}
@@ -166,9 +166,11 @@ namespace QFramework
             return JsonConvert.DeserializeObject<T>(json);
 		}
 
-		public static void SaveJson<T>(this T obj, string path) where T : class
+		public static string SaveJson<T>(this T obj, string path) where T : class
 		{
-			File.WriteAllText(path, obj.ToJson<T>());
+			var jsonContent = obj.ToJson();
+			File.WriteAllText(path, jsonContent);
+			return jsonContent;
 		}
 
 		public static T LoadJson<T>(string path) where T : class

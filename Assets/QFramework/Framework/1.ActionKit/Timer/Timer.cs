@@ -5,17 +5,16 @@
 ****************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 
 namespace QFramework
 {
-    [QMonoSingletonAttribute("[Tools]/Timer")]
-    public class Timer : QMonoSingleton<Timer>
+    [QMonoSingletonPath("[Tools]/Timer")]
+    public class Timer : MonoSingleton<Timer>
     {
-        BinaryHeap<TimeItem> m_UnScaleTimeHeap = new BinaryHeap<TimeItem>(128, BinaryHeapSortMode.kMin);
-        BinaryHeap<TimeItem> m_ScaleTimeHeap = new BinaryHeap<TimeItem>(128, BinaryHeapSortMode.kMin);
+        private readonly BinaryHeap<TimeItem> m_UnScaleTimeHeap = new BinaryHeap<TimeItem>(128, BinaryHeapSortMode.kMin);
+        private readonly BinaryHeap<TimeItem> m_ScaleTimeHeap = new BinaryHeap<TimeItem>(128, BinaryHeapSortMode.kMin);
         private float m_CurrentUnScaleTime = -1;
         private float m_CurrentScaleTime = -1;
 

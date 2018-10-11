@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (c) 2017 liangxie
+ * Copyright (c) 2017 ~ 2018.7 liangxie
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
@@ -30,7 +30,9 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 #endif
+using System.Net;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace QFramework
 {
@@ -45,7 +47,7 @@ namespace QFramework
         /// <returns>IP string</returns>
         public static string GetAddressIP()
         {
-            string AddressIP = string.Empty;  
+            var AddressIP = string.Empty;
 #if UNITY_IPHONE
             NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces(); ;  
             foreach (NetworkInterface adapter in adapters)  
@@ -67,18 +69,22 @@ namespace QFramework
                 }  
             }  
 #endif
-#if UNITY_STANDALONE_WIN
-        //获取本地的IP地址  
-		foreach (IPAddress _IPAddress in Dns.GetHostEntry(Dns.GetHostName()).AddressList)  
-		{
-		    if (_IPAddress.AddressFamily.ToString() == "InterNetwork")
-		    {
-		        AddressIP = _IPAddress.ToString();
-		    }  
-		}  
-#endif  
 
-            return Network.player.ipAddress;  
+#if UNITY_2018
+            //获取本地的IP地址  
+            foreach (IPAddress _IPAddress in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+            {
+                if (_IPAddress.AddressFamily.ToString() == "InterNetwork")
+                {
+                    AddressIP = _IPAddress.ToString();
+                    return AddressIP;
+                }
+            }
+
+            return AddressIP;
+#else
+            return Network.player.ipAddress;
+#endif
         }
 
         public static bool IsReachable

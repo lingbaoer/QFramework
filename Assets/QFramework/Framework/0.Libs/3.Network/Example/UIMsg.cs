@@ -35,17 +35,15 @@ namespace QFramework
         Msg=QMgrID.UI,
     }
 
-	public class UIMsgData : UIPageData
+	public class UIMsgData : UIPanelData
 	{
 		// TODO: Query Mgr's Data
 	}
 
-	public partial class UIMsg : QUIBehaviour
+	public partial class UIMsg : UIPanel
 	{
 		protected override void InitUI(IUIData uiData = null)
 		{
-			mData = uiData as UIMsgData;
-			//please add init code here
 		}
 
 		protected override void ProcessMsg (int eventId,QMsg msg)
@@ -88,7 +86,5 @@ namespace QFramework
 		{
 			Debug.Log("[ UIMsg:]" + content);
 		}
-
-		UIMsgData mData = null;
 	}
 }

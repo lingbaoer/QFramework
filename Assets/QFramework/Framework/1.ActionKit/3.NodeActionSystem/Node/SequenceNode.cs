@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (c) 2017 liangxie
+ * Copyright (c) 2017 ~ 2018.8 liangxie
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
@@ -27,20 +27,28 @@ namespace QFramework
 {
 	using System.Collections.Generic;
 
-	/// <inheritdoc />
 	/// <summary>
 	/// 序列执行节点
 	/// </summary>
-	public class SequenceNode : NodeAction ,IPoolable
+	public class SequenceNode : NodeAction ,INode
 	{
-		protected readonly List<IAction> mNodes = new List<IAction>();
+		protected readonly List<IAction> mNodes         = new List<IAction>();
 		protected readonly List<IAction> mExcutingNodes = new List<IAction>();
 		
-		public bool Completed = false;
-
 		public int TotalCount
 		{
 			get { return mExcutingNodes.Count; }
+		}
+
+		public IAction CurrentExecutingNode
+		{
+			get
+			{
+				var currentNode = mExcutingNodes[0];
+				var node = currentNode as INode;
+				Log.E(node);
+				return node == null ? currentNode : node.CurrentExecutingNode;
+			}
 		}
 
 		protected override void OnReset()
@@ -51,41 +59,45 @@ namespace QFramework
 				node.Reset();
 				mExcutingNodes.Add(node);
 			}
-			Completed = false;
 		}
 
 		protected override void OnExecute(float dt)
 		{
 			if (mExcutingNodes.Count > 0)
 			{
-				if (mExcutingNodes[0].Execute(dt))
+				// 如果有异常，则进行销毁，不再进行下边的操作
+				if (mExcutingNodes[0].Disposed && !mExcutingNodes[0].Finished)
+				{
+					Dispose();
+					return;
+				}
+
+				while (mExcutingNodes[0].Execute(dt))
 				{
 					mExcutingNodes.RemoveAt(0);
+
+					OnCurrentActionFinished();
+
+					if (mExcutingNodes.Count == 0)
+					{
+						break;
+					}
 				}
-			} 
-			else
-			{
-				Finished = true;
-				Completed = true;
 			}
+
+			Finished = mExcutingNodes.Count == 0;
 		}
 
-		public static SequenceNode Allocate(params IAction[] nodes)
+		protected virtual void OnCurrentActionFinished() {}
+
+		public SequenceNode(params IAction[] nodes)
 		{
-			var retNode = SafeObjectPool<SequenceNode>.Instance.Allocate();
 			foreach (var node in nodes)
 			{
-				retNode.mNodes.Add(node);
-				retNode.mExcutingNodes.Add(node);
+				mNodes.Add(node);
+				mExcutingNodes.Add(node);
 			}
-
-			return retNode;
 		}
-
-		/// <summary>
-		/// 不建议使用
-		/// </summary>
-		public SequenceNode(){}
 
 		public SequenceNode Append(IAction appendedNode)
 		{
@@ -98,17 +110,16 @@ namespace QFramework
 		{
 			base.OnDispose();
 			
-			SafeObjectPool<SequenceNode>.Instance.Recycle(this);
-		}
+			if (null != mNodes)
+			{
+				mNodes.ForEach(node => node.Dispose());
+				mNodes.Clear();
+			}
 
-		void IPoolable.OnRecycled()
-		{
-			mNodes.ForEach(node => node.Dispose());
-			mNodes.Clear();
-
-			mExcutingNodes.Clear();
-		}
-
-		bool IPoolable.IsRecycled { get; set; }
+			if (null != mExcutingNodes)
+			{
+				mExcutingNodes.Clear();
+			}
+		}	
 	}
 }

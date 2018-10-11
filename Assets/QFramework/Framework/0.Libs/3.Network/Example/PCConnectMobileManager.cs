@@ -121,7 +121,7 @@ namespace QFramework
                     break;
                 case (int)PCConnectMobileEvent.SocketEvent:
                     SocketMsg socketMsg = msg as SocketMsg;
-                    socketMsg.msgId = socketMsg.ToEventID;
+                    socketMsg.EventID = socketMsg.ToEventID;
 
                     if (IsPCClient)
                     {
@@ -141,12 +141,12 @@ namespace QFramework
 
         public static PCConnectMobileManager Instance
         {
-            get { return QMonoSingletonProperty<PCConnectMobileManager>.Instance; }
+            get { return MonoSingletonProperty<PCConnectMobileManager>.Instance; }
         }
-
-        protected override void SetupMgrId()
+        
+        public override int ManagerId
         {
-            mMgrId = QMgrID.PCConnectMobile;
+            get { return QMgrID.PCConnectMobile; }
         }
     }
 }

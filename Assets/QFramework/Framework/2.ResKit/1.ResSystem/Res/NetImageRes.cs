@@ -1,11 +1,9 @@
 ﻿/****************************************************************************
  * Copyright (c) 2017 snowcold
- * Copyright (c) 2017 liangxie
+ * Copyright (c) 2017 ~ 2018.7 liangxie
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
- * https://github.com/liangxiegame/QSingleton
- * https://github.com/liangxiegame/QChain
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -68,7 +66,7 @@ namespace QFramework
             get { return string.Format("{0}{1}", FilePath.PersistentDataPath4Photo, mHashCode); }
         }
 
-        public override object RawAsset
+        public virtual object RawAsset
         {
             get { return mRawAsset; }
         }
@@ -183,12 +181,12 @@ namespace QFramework
                 return;
             }
 
-            ResMgr.Instance.PostIEnumeratorTask(this);
+            ResMgr.Instance.PushIEnumeratorTask(this);
             //ResMgr.S.PostLoadTask(LoadImage());
         }
 
         //完全的WWW方式,Unity 帮助管理纹理缓存，并且效率貌似更高
-        public override IEnumerator StartIEnumeratorTask(System.Action finishCallback)
+        public override IEnumerator DoLoadAsync(System.Action finishCallback)
         {
             if (RefCount <= 0)
             {

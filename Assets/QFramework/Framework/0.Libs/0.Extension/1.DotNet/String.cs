@@ -205,10 +205,24 @@ namespace QFramework
         {
             return selfUrl.Split('/').Last();
         }
-
-        public static int ToInt(this string selfStr)
+        
+        public static int ToInt(this string selfStr, int defaulValue = 0)
         {
-            return int.Parse(selfStr);
+            var retValue = defaulValue;
+            return int.TryParse(selfStr, out retValue) ? retValue : defaulValue;
+        }
+
+        public static DateTime ToDateTime(this string selfStr, DateTime defaultValue = default(DateTime))
+        {
+            var retValue = defaultValue;
+            return DateTime.TryParse(selfStr, out retValue) ? retValue : defaultValue;
+        }
+
+
+        public static float ToFloat(this string selfStr,float defaulValue = 0)
+        {
+            var retValue = defaulValue;
+            return float.TryParse(selfStr, out retValue) ? retValue : defaulValue;
         }
 
         private const char Spriter1 = ',';

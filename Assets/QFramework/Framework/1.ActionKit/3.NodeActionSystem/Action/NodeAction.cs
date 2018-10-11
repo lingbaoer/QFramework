@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (c) 2017 liangxie
+ * Copyright (c) 2017 ~ 2018.5 liangxie
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
@@ -25,17 +25,33 @@
 
 namespace QFramework
 {
+    using System;
+
     public abstract class NodeAction : IAction
     {
-        public System.Action OnBeganCallback = null;
-        public System.Action OnEndedCallback = null;
-        public System.Action OnDisposedCallback = null;
-        
+        public Action OnBeganCallback = null;
+        public Action OnEndedCallback = null;
+        public Action OnDisposedCallback = null;
+
         protected bool mOnBeginCalled = false;
 
-        #region IExecuteNode Support
-        public bool Finished { get; protected set; }
+        #region IAction Support
+        bool IAction.Disposed
+        {
+            get { return mDisposed; }
+        }
+
         protected bool mDisposed = false;
+
+        public bool Finished { get; protected set; }
+
+        public virtual void Finish()
+        {
+            Finished = true;
+            OnEndedCallback.InvokeGracefully();
+            OnEnd();
+        }
+
 
         public void Break()
         {
@@ -59,6 +75,12 @@ namespace QFramework
 
         public bool Execute(float dt)
         {
+            // 有可能被别的地方调用
+            if (Finished)
+            {
+                return Finished;
+            }
+
             if (!mOnBeginCalled)
             {
                 mOnBeginCalled = true;
@@ -72,9 +94,8 @@ namespace QFramework
             }
 
             if (Finished)
-            {                
-                OnEnd();
-                OnEndedCallback.InvokeGracefully();
+            {
+                Finish();
             }
 
             return Finished || mDisposed;

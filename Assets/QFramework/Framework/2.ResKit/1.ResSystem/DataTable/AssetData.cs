@@ -37,8 +37,8 @@ namespace QFramework
     {
         private string mAssetName;
         private string mOwnerBundleName;
-        private int mAbIndex;
-        private short mAssetType;
+        private int    mAbIndex;
+        private short  mAssetType;
 
         public string AssetName
         {
@@ -63,8 +63,8 @@ namespace QFramework
             get
             {
                 return string.IsNullOrEmpty(mOwnerBundleName)
-                    ? AssetName.ToLower()
-                    : OwnerBundleName.ToLower() + AssetName.ToLower();
+                    ? AssetName
+                    : OwnerBundleName + AssetName;
             }
         }
 
@@ -74,7 +74,7 @@ namespace QFramework
             set { mAssetType = value; }
         }
 
-        public AssetData(string assetName, short assetType, int abIndex, string ownerBundleName)
+        public AssetData(string assetName, short assetType, int abIndex,string ownerBundleName)
         {
             mAssetName = assetName;
             mAssetType = assetType;
@@ -82,8 +82,6 @@ namespace QFramework
             mOwnerBundleName = ownerBundleName;
         }
 
-        public AssetData()
-        {
-        }
+        public AssetData(){}
     }
 }

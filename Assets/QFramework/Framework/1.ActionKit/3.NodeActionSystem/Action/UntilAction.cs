@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (c) 2017 liangxie
+ * Copyright (c) 2017 ~ 2018.8 liangxie
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
@@ -27,6 +27,7 @@ namespace QFramework
 {
     using System;
 
+    /// <inheritdoc />
     /// <summary>
     /// like filter, add condition
     /// </summary>
@@ -34,7 +35,7 @@ namespace QFramework
     {
         private Func<bool> mCondition;
 
-        public static UntilAction Allocate(Func<bool> condition, bool autoDispose = false)
+        public static UntilAction Allocate(Func<bool> condition)
         {
             var retNode = SafeObjectPool<UntilAction>.Instance.Allocate();
             retNode.mCondition = condition;
@@ -51,11 +52,12 @@ namespace QFramework
             SafeObjectPool<UntilAction>.Instance.Recycle(this);
         }
 
-        public void OnRecycled()
+        void IPoolable.OnRecycled()
         {
+            Reset();
             mCondition = null;
         }
 
-        public bool IsRecycled { get; set; }
+        bool IPoolable.IsRecycled { get; set; }
     }
 }

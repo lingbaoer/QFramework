@@ -32,11 +32,13 @@ namespace QFramework
     /// </summary>
     public interface IAction : IDisposable
     {
-        void Break();
-        
+        bool Disposed { get; }
+
         bool Execute(float delta);
 
         void Reset();
+
+        void Finish();
         
         bool Finished { get; }
     }

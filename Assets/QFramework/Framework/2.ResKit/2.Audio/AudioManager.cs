@@ -4,8 +4,6 @@
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
- * https://github.com/liangxiegame/QSingleton
- * https://github.com/liangxiegame/QChain
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -189,16 +187,15 @@ namespace QFramework
 		public void Dispose()
 		{
 		}
-		
 
-		protected override void SetupMgrId()
+		public override int ManagerId
 		{
-			mMgrId = QMgrID.Audio;
+			get { return QMgrID.Audio; }
 		}
-
+		
 		protected override void ProcessMsg(int key, QMsg msg)
 		{
-			switch (msg.msgId)
+            switch (msg.EventID)
 			{
 				case (int) AudioEvent.SoundSwitch:
 					AudioMsgWithBool soundSwitchMsg = msg as AudioMsgWithBool;
@@ -414,7 +411,7 @@ namespace QFramework
 
 		public static AudioManager Instance
 		{
-			get { return QMonoSingletonProperty<AudioManager>.Instance; }
+			get { return MonoSingletonProperty<AudioManager>.Instance; }
 		}
 
 		#endregion

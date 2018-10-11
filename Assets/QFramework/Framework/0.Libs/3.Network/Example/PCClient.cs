@@ -30,7 +30,7 @@ namespace QFramework
     using System.Collections.Generic;
     
     [QMonoSingletonPath("[Framework]/PCClient")]
-    public class PCClient : QMonoSingleton<PCClient>
+    public class PCClient : MonoSingleton<PCClient>
     {
         private ISocketClient mSocketClient;
 
@@ -47,7 +47,7 @@ namespace QFramework
             mSocketClient.Disconnect();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             DisConnect();
         }
@@ -102,7 +102,7 @@ namespace QFramework
             if (success)
             {
                 SocketMsg msg = SerializeHelper.FromProtoBuff<SocketMsg>(message);
-                Log.I("Received:{0}", msg.msgId);
+                Log.I("Received:{0}", msg.EventID);
                 mMsgQueue.Enqueue(msg);
             }
         }

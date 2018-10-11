@@ -30,17 +30,15 @@ using UniRx;
 
 namespace QFramework.Example
 {
-	public class UIConnectData : UIPageData
+	public class UIConnectData : UIPanelData
 	{
 		// TODO: Query Mgr's Data
 	}
 
-	public partial class UIConnect : QUIBehaviour
+	public partial class UIConnect : UIPanel
 	{
 		protected override void InitUI(IUIData uiData = null)
 		{
-			mData = uiData as UIConnectData;
-			//please add init code here
 		}
 
 		protected override void ProcessMsg (int eventId,QMsg msg)
@@ -76,7 +74,5 @@ namespace QFramework.Example
 		{
 			Debug.Log("[ UIConnect:]" + content);
 		}
-
-		UIConnectData mData = null;
 	}
 }

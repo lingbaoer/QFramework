@@ -4,8 +4,6 @@
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
- * https://github.com/liangxiegame/QSingleton
- * https://github.com/liangxiegame/QChain
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +53,7 @@ namespace QFramework
     /// <summary>
     /// 资源下载器
     /// </summary>
-    public class ResDownloader : QSingleton<ResDownloader>
+    public class ResDownloader : Singleton<ResDownloader>
     {
         private Dictionary<string, IDownloadTask> mAllDownloadTaskMap = new Dictionary<string, IDownloadTask>();
         private List<IDownloadTask> mWaitDownloadList = new List<IDownloadTask>();

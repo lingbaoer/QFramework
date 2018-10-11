@@ -1,11 +1,9 @@
 /****************************************************************************
  * Copyright (c) 2017 snowcold
- * Copyright (c) 2017 liangxie
+ * Copyright (c) 2017 ~ 2018.5 liangxie
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
- * https://github.com/liangxiegame/QSingleton
- * https://github.com/liangxiegame/QChain
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,16 +26,14 @@
 
 namespace QFramework
 {
-    using System;
     using System.Collections;
     
     public interface IEnumeratorTask
     {
-        IEnumerator StartIEnumeratorTask(System.Action finishCallback);
+        IEnumerator DoLoadAsync(System.Action finishCallback);
     }
 
     public interface IEnumeratorTaskMgr
     {
-        void PostIEnumeratorTask(IEnumeratorTask task);
     }
 }

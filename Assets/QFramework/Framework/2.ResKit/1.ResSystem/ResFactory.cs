@@ -1,11 +1,9 @@
 ﻿/****************************************************************************
  * Copyright (c) 2017 snowcold
- * Copyright (c) 2017 liangxie
+ * Copyright (c) 2017 ~ 2018.5 liangxie
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
- * https://github.com/liangxiegame/QSingleton
- * https://github.com/liangxiegame/QChain
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,11 +26,8 @@
 
 namespace QFramework
 {
-        
-    public class ResFactory
+    public static class ResFactory
     {
-        private delegate IRes ResCreator(string name);
-
         static ResFactory()
         {
             Log.I("Init[ResFactory]");
@@ -41,11 +36,11 @@ namespace QFramework
             SafeObjectPool<InternalRes>.Instance.MaxCacheCount = 40;
             SafeObjectPool<NetImageRes>.Instance.MaxCacheCount = 20;
         }
-        
-        public static IRes Create(string assetName,string ownerBundleName)
+
+        public static IRes Create(string assetName, string ownerBundleName)
         {
             short assetType = 0;
-            if (assetName.StartsWith("Resources/"))
+            if (assetName.StartsWith("Resources/") || assetName.StartsWith("resources://"))
             {
                 assetType = ResType.Internal;
             }
@@ -55,10 +50,11 @@ namespace QFramework
             }
             else
             {
-                AssetData data = AssetDataTable.Instance.GetAssetData(assetName,ownerBundleName);
+                var data = ResDatas.Instance.GetAssetData(assetName, ownerBundleName);
+
                 if (data == null)
                 {
-                    Log.E("Failed to Create Res. Not Find AssetData:" + ownerBundleName + assetName );
+                    Log.E("Failed to Create Res. Not Find AssetData:" + ownerBundleName + assetName);
                     return null;
                 }
                 else
@@ -67,21 +63,24 @@ namespace QFramework
                 }
             }
 
-            return Create(assetName,ownerBundleName,assetType);
+            return Create(assetName, ownerBundleName, assetType);
         }
-        
-        public static IRes Create(string assetName,string ownerBundleName, short assetType)
+
+        public static IRes Create(string assetName, string ownerBundleName, short assetType)
         {
             switch (assetType)
             {
                 case ResType.AssetBundle:
                     return AssetBundleRes.Allocate(assetName);
                 case ResType.ABAsset:
-                    return AssetRes.Allocate(assetName,ownerBundleName);
+                    return AssetRes.Allocate(assetName, ownerBundleName);
                 case ResType.ABScene:
                     return SceneRes.Allocate(assetName);
                 case ResType.Internal:
-                    return InternalRes.Allocate(assetName);
+                    return InternalRes.Allocate(assetName,
+                        assetName.StartsWith("resources://")
+                            ? InternalResNamePrefixType.Url
+                            : InternalResNamePrefixType.Folder);
                 case ResType.NetImageRes:
                     return NetImageRes.Allocate(assetName);
                 case ResType.LocalImageRes:
@@ -91,41 +90,38 @@ namespace QFramework
                     return null;
             }
         }
-        
-        
 
         public static IRes Create(string assetName)
         {
             short assetType = 0;
-            if (assetName.StartsWith("Resources/"))
+            if (assetName.StartsWith("Resources/") || assetName.StartsWith("resources://"))
             {
                 assetType = ResType.Internal;
             }
             else if (assetName.StartsWith("NetImage:"))
             {
                 assetType = ResType.NetImageRes;
-            } else if (assetName.StartsWith("LocalImage:"))
+            }
+            else if (assetName.StartsWith("LocalImage:"))
             {
                 assetType = ResType.LocalImageRes;
             }
             else
             {
-                AssetData data = AssetDataTable.Instance.GetAssetData(assetName);
+                var data = ResDatas.Instance.GetAssetData(assetName);
                 if (data == null)
                 {
                     Log.E("Failed to Create Res. Not Find AssetData:" + assetName);
                     return null;
                 }
-                else
-                {
-                    assetType = data.AssetType;
-                }
+
+                assetType = data.AssetType;
             }
 
             return Create(assetName, assetType);
         }
 
-        public static IRes Create(string assetName, short assetType)
+        private static IRes Create(string assetName, short assetType)
         {
             switch (assetType)
             {
@@ -136,7 +132,10 @@ namespace QFramework
                 case ResType.ABScene:
                     return SceneRes.Allocate(assetName);
                 case ResType.Internal:
-                    return InternalRes.Allocate(assetName);
+                    return InternalRes.Allocate(assetName,
+                        assetName.StartsWith("resources://")
+                            ? InternalResNamePrefixType.Url
+                            : InternalResNamePrefixType.Folder);
                 case ResType.NetImageRes:
                     return NetImageRes.Allocate(assetName);
                 case ResType.LocalImageRes:

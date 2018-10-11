@@ -27,12 +27,19 @@ namespace QFramework
 {
     using System;
 
+    public class QMonoSingletonPath : MonoSingletonPath
+    {
+        public QMonoSingletonPath(string pathInHierarchy) : base(pathInHierarchy)
+        {
+        }
+    }
+
     [AttributeUsage(AttributeTargets.Class)]
-    public class QMonoSingletonPath : Attribute
+    public class MonoSingletonPath : Attribute
     {
 		private string mPathInHierarchy;
 
-        public QMonoSingletonPath(string pathInHierarchy)
+        public MonoSingletonPath(string pathInHierarchy)
         {
             mPathInHierarchy = pathInHierarchy;
         }
@@ -40,15 +47,6 @@ namespace QFramework
         public string PathInHierarchy
         {
             get { return mPathInHierarchy; }
-        }
-    }
-    
-    [Obsolete("QMonoSingletonAttribute is deprecated.prease use QMonoSingletonPath instead")]
-    [AttributeUsage(AttributeTargets.Class)]
-    public class QMonoSingletonAttribute : QMonoSingletonPath
-    {
-        public QMonoSingletonAttribute(string pathInHierarchy) : base(pathInHierarchy)
-        {
         }
     }
 }

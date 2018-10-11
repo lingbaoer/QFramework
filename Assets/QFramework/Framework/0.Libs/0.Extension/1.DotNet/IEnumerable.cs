@@ -1,6 +1,5 @@
 /****************************************************************************
- * Copyright (c) 2017 liangxie
- * Copyright (c) 2018 liangxie
+ * Copyright (c) 2017 ~ 2018.8  liangxie
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
@@ -42,7 +41,7 @@ namespace QFramework
             // IEnumerable<T>
             IEnumerable<int> testIenumerable = new List<int> {1, 2, 3};
             testIenumerable.ForEach(number => Debug.Log(number));
-            var testDictionary = new Dictionary<string, string>()
+            new Dictionary<string, string>()
                 .ForEach(keyValue => Log.I("key:{0},value:{1}", keyValue.Key, keyValue.Value));
             
             // testList
@@ -107,6 +106,23 @@ namespace QFramework
 
             for (var i = selfList.Count - 1; i >= 0; --i)
                 action(selfList[i]);
+
+            return selfList;
+        }
+
+        /// <summary>
+        /// Fors the each reverse.
+        /// </summary>
+        /// <returns>The each reverse.</returns>
+        /// <param name="selfList">Self list.</param>
+        /// <param name="action">Action.</param>
+        /// <typeparam name="T">The 1st type parameter.</typeparam>
+        public static List<T> ForEachReverse<T>(this List<T> selfList, Action<T, int> action)
+        {
+            if (action == null) throw new ArgumentException();
+
+            for (var i = selfList.Count - 1; i >= 0; --i)
+                action(selfList[i], i);
 
             return selfList;
         }

@@ -4,8 +4,6 @@
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
- * https://github.com/liangxiegame/QSingleton
- * https://github.com/liangxiegame/QChain
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +27,7 @@
 namespace QFramework
 {
     using UnityEngine;
-        
+
     public class BaseRes : AbstractRes
     {
         public BaseRes(string assetName) : base(assetName)
@@ -52,7 +50,7 @@ namespace QFramework
                 }
                 else
                 {
-                        Resources.UnloadAsset(mAsset);
+                    Resources.UnloadAsset(mAsset);
                 }
 
                 mAsset = null;

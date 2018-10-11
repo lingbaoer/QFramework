@@ -68,12 +68,12 @@ namespace QFramework
 
         public static SafeObjectPool<T> Instance
         {
-            get { return QSingletonProperty<SafeObjectPool<T>>.Instance; }
+            get { return SingletonProperty<SafeObjectPool<T>>.Instance; }
         }
 
         public void Dispose()
         {
-            QSingletonProperty<SafeObjectPool<T>>.Dispose();
+            SingletonProperty<SafeObjectPool<T>>.Dispose();
         }
         #endregion
 
@@ -84,6 +84,8 @@ namespace QFramework
         /// <param name="initCount">Init Cache count.</param>
         public void Init(int maxCount, int initCount)
         {
+            MaxCacheCount = maxCount;
+            
             if (maxCount > 0)
             {
                 initCount = Math.Min(maxCount, initCount);
@@ -130,7 +132,7 @@ namespace QFramework
         /// <summary>
         /// Allocate T instance.
         /// </summary>
-        public T Allocate()
+        public override T Allocate()
         {
             var result = base.Allocate();
             result.IsRecycled = false;

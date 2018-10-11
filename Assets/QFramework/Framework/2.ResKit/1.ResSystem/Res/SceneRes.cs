@@ -4,8 +4,6 @@
  * 
  * http://qframework.io
  * https://github.com/liangxiegame/QFramework
- * https://github.com/liangxiegame/QSingleton
- * https://github.com/liangxiegame/QChain
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +29,7 @@ namespace QFramework
         
     public class SceneRes : AssetRes
     {
-        public new static SceneRes Allocate(string name)
+        public static SceneRes Allocate(string name)
         {
             SceneRes res = SafeObjectPool<SceneRes>.Instance.Allocate();
             if (res != null)
@@ -74,9 +72,9 @@ namespace QFramework
                 return false;
             }
 
-            AssetBundleRes abR = ResMgr.Instance.GetRes<AssetBundleRes>(AssetBundleName);
+            var abR = ResMgr.Instance.GetRes<AssetBundleRes>(AssetBundleName);
 
-            if (abR == null || abR.assetBundle == null)
+            if (abR == null || abR.AssetBundle == null)
             {
                 Log.E("Failed to Load Asset, Not Find AssetBundleImage:" + abR);
                 return false;

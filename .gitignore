@@ -32,3 +32,17 @@ QFramework2017.sln
 .vs
 Assets/StreamingAssets/AssetBundles
 AssetBundles.meta
+bin.meta
+obj.meta
+Pro.meta
+AssetBundles
+Assets/QFramework/Demo
+Demo.meta
+Plugins.meta
+obj/
+Packages/
+Assets/.qframework
+Assembly-CSharp-firstpass.csproj
+Assets/QFramework/DoodleJump
+DoodleJump.meta
+PlatformRunner.meta
